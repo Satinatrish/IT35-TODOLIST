@@ -1,22 +1,37 @@
 class TodoList {
     constructor() {
+        console.log("TodoList initialized");
+
         this.editingIndex = -1;
         this.addButton = document.getElementById('addButton');
         this.todoInput = document.getElementById('todoInput');
         this.todoList = document.getElementById('todoList');
-        this.activityLog = document.getElementById('activityLog'); 
+        this.activityLog = document.getElementById('activityLog');
 
-        this.addButton.addEventListener('click', () => this.addOrUpdateTask());
+        this.addButton.addEventListener('click', () => {
+            console.log("Add/Update button clicked");
+            this.addOrUpdateTask();
+        });
+
         this.todoList.addEventListener('click', (e) => {
-            const action = e.target.classList.contains('removeButton') ? 'remove' :
-                           e.target.classList.contains('editButton') ? 'edit' :
-                           e.target.classList.contains('doneButton') ? 'done' : null;
-            if (action) this[action + 'Task'](e);
+            console.log("Todo list clicked:", e.target);
+
+            const action =
+                e.target.classList.contains('removeButton') ? 'remove' :
+                e.target.classList.contains('editButton') ? 'edit' :
+                e.target.classList.contains('doneButton') ? 'done' :
+                null;
+
+            if (action) {
+                console.log(`Action detected: ${action}`);
+                this[action + 'Task'](e);
+            }
         });
     }
 
-   
     logActivity(message) {
+        console.log("Activity log:", message);
+
         const li = document.createElement('li');
         li.className = 'list-group-item';
         li.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
@@ -25,19 +40,27 @@ class TodoList {
 
     addOrUpdateTask() {
         const taskText = this.todoInput.value.trim();
+        console.log("Input value:", taskText);
+
         if (taskText) {
             if (this.editingIndex === -1) {
+                console.log("Adding new task");
                 this.addTask(taskText);
-                this.logActivity(`Added task: "${taskText}"`); 
+                this.logActivity(`Added task: "${taskText}"`);
             } else {
+                console.log("Updating task at index:", this.editingIndex);
                 this.updateTask(taskText);
-                this.logActivity(`Updated task to: "${taskText}"`); 
+                this.logActivity(`Updated task to: "${taskText}"`);
             }
             this.todoInput.value = '';
+        } else {
+            console.log("Empty input — nothing added");
         }
     }
 
     addTask(taskText) {
+        console.log("addTask called with:", taskText);
+
         const listItem = document.createElement('li');
         listItem.className = 'list-group-item todo-item';
         listItem.innerHTML = `
@@ -51,47 +74,70 @@ class TodoList {
                 <button class="btn btn-danger btn-sm removeButton">Remove</button>
             </div>
         `;
+
         this.todoList.appendChild(listItem);
+        console.log("Task added to DOM");
     }
 
     doneTask(event) {
+        console.log("doneTask triggered");
+
         const taskItem = event.target.closest('.todo-item');
         const taskText = taskItem.querySelector('.task-text');
+
         taskText.classList.toggle('completed');
 
         const buttons = taskItem.querySelectorAll('button');
         buttons.forEach(button => button.disabled = true);
 
-        this.logActivity(`Marked task as done: "${taskText.textContent}"`); 
+        this.logActivity(`Marked task as done: "${taskText.textContent}"`);
+        console.log("Task marked as done:", taskText.textContent);
     }
 
     updateTask(taskText) {
+        console.log("updateTask called with:", taskText);
+
         this.todoList.children[this.editingIndex]
             .querySelector('.task-text').textContent = taskText;
+
         this.resetEditing();
+        console.log("Task updated successfully");
     }
 
     removeTask(event) {
+        console.log("removeTask triggered");
+
         const taskItem = event.target.closest('.todo-item');
         const taskText = taskItem.querySelector('.task-text').textContent;
 
         this.todoList.removeChild(taskItem);
-        this.logActivity(`Removed task: "${taskText}"`); 
+        this.logActivity(`Removed task: "${taskText}"`);
+
+        console.log("Task removed:", taskText);
     }
 
     editTask(event) {
+        console.log("editTask triggered");
+
         const taskItem = event.target.closest('.todo-item');
         this.todoInput.value = taskItem.querySelector('.task-text').textContent;
+
         this.editingIndex = Array.from(this.todoList.children).indexOf(taskItem);
         this.addButton.textContent = 'Update';
 
-        this.logActivity(`Editing task: "${this.todoInput.value}"`); G
+        this.logActivity(`Editing task: "${this.todoInput.value}"`);
+        console.log("Editing task at index:", this.editingIndex);
     }
 
     resetEditing() {
+        console.log("Resetting edit mode");
+
         this.editingIndex = -1;
         this.addButton.textContent = 'Add';
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => new TodoList());
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM fully loaded");
+    new TodoList();
+});
